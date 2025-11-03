@@ -1,0 +1,11 @@
+fastapi
+uvicorn[standard]
+scikit-learn
+pandas
+sumy
+wikipedia-api
+transformers
+torch
+python-multipart
+jinja2
+datasketch

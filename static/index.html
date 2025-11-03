@@ -1,0 +1,376 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Smart Student Assistant Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; transition: background 0.3s, color 0.3s; }
+
+    body {
+      font-family: 'Inter', Arial, sans-serif;
+      background: #f1f5f9;
+      color: #1e293b;
+      display: flex;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* --- Dark Mode --- */
+    body.dark {
+      background: #0f172a;
+      color: #e2e8f0;
+    }
+    body.dark .sidebar { background: #1e293b; }
+    body.dark .card { background: #1e293b; color: #f1f5f9; }
+    body.dark textarea { background: #0f172a; color: #f1f5f9; border-color: #334155; }
+    body.dark .btn { background: #2563eb; }
+    body.dark li { background: #1e293b; border-left-color: #2563eb; }
+    body.dark .navbar { background: #1e293b; border-bottom-color: #334155; }
+
+    /* --- Sidebar --- */
+    .sidebar {
+      width: 250px;
+      background: #0f172a;
+      color: #f8fafc;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px;
+    }
+
+    .logo {
+      font-size: 1.4em;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 30px;
+      color: #38bdf8;
+    }
+
+    .nav {
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+
+    .nav button {
+      background: none;
+      color: #f1f5f9;
+      border: none;
+      text-align: left;
+      font-size: 15px;
+      padding: 10px 15px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .nav button:hover, .nav button.active {
+      background: #1e3a8a;
+    }
+
+    .footer {
+      text-align: center;
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    /* --- Main Content --- */
+    .main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+    }
+
+    /* --- Top Navbar --- */
+    .navbar {
+      height: 60px;
+      background: #ffffff;
+      border-bottom: 1px solid #e2e8f0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+    }
+
+    .navbar .title {
+      font-weight: 600;
+      font-size: 18px;
+      color: #0f172a;
+    }
+
+    .navbar .actions {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .navbar button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .profile {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: #0284c7;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 14px;
+    }
+
+    /* --- Content Area --- */
+    .content {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 30px;
+      box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+      max-width: 900px;
+      margin: auto;
+    }
+
+    textarea {
+      width: 100%;
+      height: 160px;
+      padding: 12px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      resize: none;
+      font-size: 15px;
+    }
+
+    textarea:focus {
+      outline: none;
+      border-color: #0284c7;
+      box-shadow: 0 0 0 2px rgba(3,105,161,0.2);
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .btn {
+      background: #0284c7;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 6px;
+      font-size: 15px;
+      cursor: pointer;
+    }
+
+    .btn:hover { background: #0369a1; }
+
+    h1 { margin-bottom: 10px; font-size: 1.8em; }
+    p { color: #475569; margin-bottom: 25px; }
+    h3 { margin-top: 25px; border-bottom: 2px solid #e2e8f0; padding-bottom: 6px; }
+    pre {
+      background: #f1f5f9;
+      padding: 12px;
+      border-radius: 8px;
+      overflow-x: auto;
+      white-space: pre-wrap;
+    }
+    li {
+      list-style: none;
+      background: #f8fafc;
+      margin-bottom: 12px;
+      padding: 12px;
+      border-left: 4px solid #0284c7;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    }
+    li strong { color: #0369a1; }
+
+    @media (max-width: 768px) {
+      .sidebar { display: none; }
+      .navbar { position: fixed; width: 100%; top: 0; }
+      .content { margin-top: 70px; padding: 20px; }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div>
+      <div class="logo">🧠 Smart Assistant</div>
+      <nav class="nav">
+        <button id="navHome" class="active" onclick="switchTab('home')">🏠 Home</button>
+        <button id="navSumm" onclick="switchTab('summarize')">📝 Summarize</button>
+        <button id="navPlag" onclick="switchTab('plagiarism')">🔍 Plagiarism</button>
+      </nav>
+    </div>
+    <div class="footer">© 2025 Smart Student Assistant</div>
+  </aside>
+
+  <!-- Main Area -->
+  <div class="main">
+    <!-- Top Navbar -->
+    <div class="navbar">
+      <div class="title">Dashboard</div>
+      <div class="actions">
+        <button id="themeToggle" title="Toggle Dark Mode">🌙</button>
+        <div class="profile" title="Profile">S</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="card" id="homeCard">
+        <h1>Welcome</h1>
+        <p>Smart Student Assistant helps you summarize content and detect plagiarism using advanced NLP techniques.</p>
+      </div>
+
+      <div class="card" id="summarizeCard" style="display:none;">
+        <h1>Text Summarization</h1>
+        <p>Enter your text below to generate short and long summaries.</p>
+        <textarea id="summInput" placeholder="Enter text here..."></textarea>
+        <div class="buttons"><button class="btn" onclick="doSumm()">Summarize</button></div>
+        <div id="summOut"></div>
+      </div>
+
+      <div class="card" id="plagiarismCard" style="display:none;">
+        <h1>Plagiarism Checker</h1>
+        <p>Paste your text to check for similarity with local datasets and Wikipedia.</p>
+        <textarea id="plagInput" placeholder="Enter text here..."></textarea>
+        <div class="buttons"><button class="btn" onclick="doPlag()">Check Plagiarism</button></div>
+        <div id="plagOut"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+  // --- Tab Switching ---
+  function switchTab(tab) {
+    document.querySelectorAll('.card').forEach(c => c.style.display = 'none');
+    document.querySelectorAll('.nav button').forEach(b => b.classList.remove('active'));
+
+    if (tab === 'home') {
+      document.getElementById('homeCard').style.display = 'block';
+      document.getElementById('navHome').classList.add('active');
+    } else if (tab === 'summarize') {
+      document.getElementById('summarizeCard').style.display = 'block';
+      document.getElementById('navSumm').classList.add('active');
+    } else if (tab === 'plagiarism') {
+      document.getElementById('plagiarismCard').style.display = 'block';
+      document.getElementById('navPlag').classList.add('active');
+    }
+  }
+
+  // --- Dark Mode ---
+  const toggleBtn = document.getElementById('themeToggle');
+  toggleBtn.addEventListener('click', () => {
+    document.body.classList.toggle('dark');
+    toggleBtn.textContent = document.body.classList.contains('dark') ? '☀' : '🌙';
+  });
+
+  // --- Summarize ---
+  async function doSumm() {
+    const text = document.getElementById('summInput').value.trim();
+    if (!text) return alert("Please enter some text.");
+    document.getElementById('summOut').innerHTML = "<p>⏳ Summarizing...</p>";
+
+    try {
+      const res = await fetch('/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text, max_sentences: 4 })
+      });
+      const j = await res.json();
+      document.getElementById('summOut').innerHTML = `
+        <h3>Short Summary</h3><pre>${j.short_summary}</pre>
+        <h3>Long Summary</h3><pre>${j.long_summary}</pre>`;
+    } catch (err) {
+      console.error(err);
+      document.getElementById('summOut').innerHTML = "<p>❌ Error during summarization.</p>";
+    }
+  }
+
+  // --- Plagiarism ---
+  async function doPlag() {
+    const text = document.getElementById('plagInput').value.trim();
+    if (!text) return alert("Please enter some text.");
+    document.getElementById('plagOut').innerHTML = "<p>⏳ Checking plagiarism...</p>";
+
+    try {
+      const res = await fetch('/plagiarism', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ text: text, method: 'tfidf', top_k: 5 })
+      });
+      const j = await res.json();
+      console.log("Response JSON:", j); // for debugging
+
+      // Safely handle undefined
+      const overall = j.overall_score ?? 0;
+
+      // Choose color based on severity
+      let color, label;
+      if (overall < 30) {
+        color = "#2ecc71"; label = "Low Plagiarism";
+      } else if (overall < 60) {
+        color = "#f39c12"; label = "Moderate Plagiarism";
+      } else {
+        color = "#e74c3c"; label = "High Plagiarism";
+      }
+
+      // Display formatted output
+      const html = `
+        <div style="
+          width: 100%;
+          border: 1px solid #ddd;
+          border-radius: 8px;
+          padding: 20px;
+          text-align: center;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        ">
+          <h2 style="margin-bottom: 10px;">Plagiarism Report</h2>
+          <div style="
+            background-color: #f0f0f0;
+            border-radius: 10px;
+            overflow: hidden;
+            height: 25px;
+            margin: 10px 0;
+            width: 100%;
+          ">
+            <div style="
+              width: ${overall}%;
+              height: 100%;
+              background-color: ${color};
+              transition: width 0.8s ease;
+            "></div>
+          </div>
+          <h3 style="color:${color}; font-weight:600;">
+            ${overall}% — ${label}
+          </h3>
+        </div>
+      `;
+
+      document.getElementById('plagOut').innerHTML = html;
+
+    } catch (err) {
+      console.error(err);
+      document.getElementById('plagOut').innerHTML = "<p>❌ Error during plagiarism check.</p>";
+    }
+  }
+</script>
+</body>
+</html>
